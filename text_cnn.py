@@ -20,6 +20,7 @@ def create_text_cnn(sequence_length,
                                    strides=(1, 1),
                                    padding='VALID',
                                    kernel_initializer=tf.keras.initializers.TruncatedNormal(stddev=0.1),
+                                   kernel_regularizer=tf.keras.regularizers.l2(l2_reg_lambda),
                                    bias_initializer=tf.keras.initializers.Constant(0.1),
                                    activation='relu')(embedded_x) # (batch_size, sequence_length - filter_size + 1, 1, num_filters)
         x = tf.keras.layers.MaxPooling2D(pool_size=(sequence_length - filter_size + 1, 1),

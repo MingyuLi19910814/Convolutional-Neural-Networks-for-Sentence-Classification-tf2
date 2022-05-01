@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--neg_sample_path', type=str, default='data/rt-polaritydata/rt-polarity.neg')
 parser.add_argument('--pos_sample_path', type=str, default='data/rt-polaritydata/rt-polarity.pos')
 parser.add_argument('--save_dir', type=str, default='tfrecord/rt-polarity')
-parser.add_argument('--max_document_len', type=int, default=-1)
+parser.add_argument('--max_document_len', type=int, default=32)
 parser.add_argument('--k_fold', type=int, default=10)
 
 tokenizer = re.compile(r"[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+", re.UNICODE)
@@ -34,7 +34,6 @@ def encode_sentence(sentence, label, vocabulary, max_document_len):
     :param max_document_len: maximum word number in a sentence
     :return:
     '''
-    print('label shape = {}, dtype = {}'.format(label.shape, label.dtype))
     encoded_feature = np.zeros(shape=(max_document_len, 300), dtype=np.float32)
     for idx, word in enumerate(tokenizer.findall(sentence)):
         if idx >= max_document_len:
