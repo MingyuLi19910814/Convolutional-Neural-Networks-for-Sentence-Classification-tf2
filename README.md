@@ -31,8 +31,9 @@ k is the number of tfrecords in the directory.
 export CKPT_DIR=<checkpoint_dir> # change this to your favorite directory to save the trained weights
 conda activate tensorflow
 python train.py --record_dir $TFRECORD_DIR\
-                --ckpt_dir CKPT_DIR
+                --ckpt_dir $CKPT_DIR
 ```
 
 # Performance
+Since the paper didn't provide enough details of the implementation, the performance is a 2% lower than the reported accuracy.
 10-fold cross validation on MR: 79.01%   
