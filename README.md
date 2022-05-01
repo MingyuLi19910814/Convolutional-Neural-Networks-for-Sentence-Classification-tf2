@@ -1,6 +1,6 @@
 # Introduction
 This repository implements the CNN-based sentiment analysis of [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/abs/1408.5882) in Tensorflow 2.
-
+Some data clearning is from [dennybritz](https://github.com/dennybritz/cnn-text-classification-tf).
 # Requirements
 ```commandline
 conda env create -f environment.yml
