@@ -35,5 +35,5 @@ python train.py --record_dir $TFRECORD_DIR\
 ```
 
 # Performance
-Since the paper didn't provide enough details of the implementation, the performance is a 2% lower than the reported accuracy.
+Since the paper didn't provide enough details of the implementation, the performance is about 2% lower than the reported accuracy.  
 10-fold cross validation on MR: 79.01%   
