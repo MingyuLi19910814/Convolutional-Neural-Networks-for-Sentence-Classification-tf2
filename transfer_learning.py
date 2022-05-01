@@ -57,7 +57,7 @@ def train(train_ds, val_ds, args):
                                                 num_filters=args.num_filters,
                                                 dropout_keep_prob=args.dropout_keep_prob,
                                                 l2_reg_lambda=args.l2_reg_lambda)
-    model.compile(optimizer=tf.keras.optimizers.Adam(1e-3),
+    model.compile(optimizer=tf.keras.optimizers.Adam(args.learning_rate),
                   loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
                   metrics=['categorical_accuracy'])
     model.fit(train_ds, epochs=args.num_epochs, validation_data=val_ds)
@@ -65,6 +65,9 @@ def train(train_ds, val_ds, args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('--learning_rate', type=float, default=1e-3, help="learning rate")
+    parser.add_argument('--batch_size', type=int, default=512, help="Batch Size (default: 64)")
+    parser.add_argument('--num_epochs', type=int, default=30, help="Number of training epochs (default: 200)")
     parser.add_argument('--use_google_news_300', type=bool, default=True, help="if use word2vec vocabulary pretrained on google news")
     parser.add_argument('--dev_sample_percentage', type=float, default=0.1, help="Percentage of the training data to use for validation")
     parser.add_argument('--positive_data_file', type=str, default='./data/rt-polaritydata/rt-polarity.pos', help='Data source for the positive data.')
@@ -74,9 +77,6 @@ if __name__ == "__main__":
     parser.add_argument('--num_filters', type=int, default=128, help='Number of filters per filter size (default: 128)')
     parser.add_argument('--dropout_keep_prob', type=float, default=0.5, help="Dropout keep probability (default: 0.5)")
     parser.add_argument('--l2_reg_lambda', type=float, default=0.0, help="L2 regularization lambda (default: 0.0)")
-    parser.add_argument('--batch_size', type=int, default=64, help="Batch Size (default: 64)")
-    parser.add_argument('--num_epochs', type=int, default=200, help="Number of training epochs (default: 200)")
-    parser.add_argument('--num_checkpoints', type=int, default=5, help="Number of checkpoints to store (default: 5)")
     args = parser.parse_args()
     train_ds, val_ds = preprocess(args)
     train(train_ds, val_ds, args)
