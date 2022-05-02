@@ -32,43 +32,42 @@ def train(args):
     tfrecord_files.sort()
     test_acc = []
     print('{} tfrecord files found'.format(tfrecord_files.__len__()))
-    if args.k_fold:
-        num_fold = tfrecord_files.__len__()
-        print('Perform {}-fold cross validation'.format(num_fold))
-        for i_fold in range(num_fold):
-            print('*' * 30 + "start fold {}".format(i_fold) + '*' * 30)
-            # prepare train, validate, test datasets
-            val_idx = i_fold
-            test_idx = (i_fold + 1) % num_fold
-            val_records = [tfrecord_files[val_idx]]
-            test_records = [tfrecord_files[test_idx]]
-            train_records = [tfrecord_files[i] for i in range(num_fold) if i != val_idx and i != test_idx]
-            train_ds = dataset_from_tfrecord(train_records, args)
-            val_ds = dataset_from_tfrecord(val_records, args)
-            test_ds = dataset_from_tfrecord(test_records, args)
-            batch_x, batch_y = next(iter(train_ds))
-            # save best model
-            ckpt_path = os.path.join(args.ckpt_dir, str(i_fold))
-            ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=ckpt_path,
-                                                               save_weights_only=True,
-                                                               monitor='val_loss',
-                                                               mode='min',
-                                                               save_best_only=True)
+    num_fold = tfrecord_files.__len__()
+    print('Perform {}-fold cross validation'.format(num_fold))
+    for i_fold in range(num_fold):
+        print('*' * 30 + "start fold {}".format(i_fold) + '*' * 30)
+        # prepare train, validate, test datasets
+        val_idx = i_fold
+        test_idx = (i_fold + 1) % num_fold
+        val_records = [tfrecord_files[val_idx]]
+        test_records = [tfrecord_files[test_idx]]
+        train_records = [tfrecord_files[i] for i in range(num_fold) if i != val_idx and i != test_idx]
+        train_ds = dataset_from_tfrecord(train_records, args)
+        val_ds = dataset_from_tfrecord(val_records, args)
+        test_ds = dataset_from_tfrecord(test_records, args)
+        batch_x, batch_y = next(iter(train_ds))
+        # save best model
+        ckpt_path = os.path.join(args.ckpt_dir, str(i_fold))
+        ckpt_callback = tf.keras.callbacks.ModelCheckpoint(filepath=ckpt_path,
+                                                           save_weights_only=True,
+                                                           monitor='val_loss',
+                                                           mode='min',
+                                                           save_best_only=True)
 
-            model = text_cnn.create_text_cnn_pretrained(sequence_length=batch_x.shape[1],
-                                                        num_classes=batch_y.shape[1],
-                                                        embedding_size=300,
-                                                        filter_sizes=list(map(int, args.filter_sizes.split(","))),
-                                                        num_filters=args.num_filters,
-                                                        dropout_keep_prob=args.dropout_keep_prob,
-                                                        l2_reg_lambda=args.l2_reg_lambda)
-            model.compile(optimizer=tf.keras.optimizers.Adam(args.learning_rate, clipnorm=args.l2_norm_clip),
-                          loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
-                          metrics=['categorical_accuracy'])
-            model.fit(train_ds, epochs=args.num_epochs, validation_data=val_ds, callbacks=[ckpt_callback])
-            model.load_weights(ckpt_path)
-            res = model.evaluate(test_ds)
-            test_acc.append(res[1])
+        model = text_cnn.create_text_cnn_pretrained(sequence_length=batch_x.shape[1],
+                                                    num_classes=batch_y.shape[1],
+                                                    embedding_size=300,
+                                                    filter_sizes=list(map(int, args.filter_sizes.split(","))),
+                                                    num_filters=args.num_filters,
+                                                    dropout_keep_prob=args.dropout_keep_prob,
+                                                    l2_reg_lambda=args.l2_reg_lambda)
+        model.compile(optimizer=tf.keras.optimizers.Adam(args.learning_rate, clipnorm=args.l2_norm_clip),
+                      loss=tf.keras.losses.CategoricalCrossentropy(from_logits=True),
+                      metrics=['categorical_accuracy'])
+        model.fit(train_ds, epochs=args.num_epochs, validation_data=val_ds, callbacks=[ckpt_callback])
+        model.load_weights(ckpt_path)
+        res = model.evaluate(test_ds)
+        test_acc.append(res[1])
         print('overall test accuracy = {}'.format(np.mean(test_acc)))
 
 
